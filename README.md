@@ -1,4 +1,4 @@
-# tamanoir
+# Tamanoir API
 
 ## Create a new connection
 
@@ -17,8 +17,26 @@ recursive | String | Will include metadata for specified node with metadata  for
 
 Options
 * consumes: application/json (default)
-* Return Value on Success
-	
-Typical Return | Values on Failure
+
+Return Value on Success | Typical Return Values on Failure
 --- | ---
 200 OK – Connection created. | 404 Not Found –
+
+
+## Execute query
+
+Execute query that come in connectionDescriptor.
+
+Method - POST
+URL "**/connections**"
+
+Argument | Type/Value | Description 
+:--- | :--- | :---
+connectionDescriptor | QueryConnectionDescriptor required | **Example:** {"url":"jdbc:postgresql://localhost:5432/foodmart","type":"jdbc","properties":{"user":"postgres","password":"postgres"}}
+
+Options
+* consumes: application/queryconnection+json (default)
+
+Return Value on Success | Typical Return Values on Failure
+--- | ---
+200 OK – Query executed. | 404 Not Found –
