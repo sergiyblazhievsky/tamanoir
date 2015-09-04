@@ -180,7 +180,7 @@ domain | Domain required | Specify updates to domain
 
 Options
 * consumes: application/json (default)
-* roduces: application/json (default)
+* produces: application/json (default)
 
 Return Value on Success | Typical Return Values on Failure
 --- | ---
