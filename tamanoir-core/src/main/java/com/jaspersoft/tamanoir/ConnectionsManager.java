@@ -52,7 +52,8 @@ public class ConnectionsManager {
         return operateConnection(connectionDescriptor, new ConnectionOperator<Object>() {
             @Override
             public Object operate(Object connection) {
-                return getProcessor(connectionDescriptor, MetadataBuilder.class).build(connection, options);
+                Object obj = getProcessor(connectionDescriptor, MetadataBuilder.class).build(connection, options);
+                return obj;
             }
         });
     }
