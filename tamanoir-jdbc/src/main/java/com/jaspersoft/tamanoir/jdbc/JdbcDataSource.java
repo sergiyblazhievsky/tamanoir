@@ -3,11 +3,7 @@ package com.jaspersoft.tamanoir.jdbc;
 import com.jaspersoft.tamanoir.ConnectionException;
 import com.jaspersoft.tamanoir.dto.ConnectionDescriptor;
 import com.mchange.v2.c3p0.DataSources;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.Element;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.springframework.cache.annotation.Cacheable;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
@@ -21,27 +17,12 @@ import java.util.Properties;
 public class JdbcDataSource {
     private final static int MAX_POOL_SIZE = 30;
     private final static int MIN_POOL_SIZE = 0;
-    private Cache cache;
 
-    private final static Log log = LogFactory.getLog(JdbcDataSource.class);
-
-    public JdbcDataSource()
-    {
-        CacheManager cm = CacheManager.getInstance();
-        cache = cm.getCache("connectionDescriptors");
-    }
-
+    @Cacheable(value="connectionDescriptors", key="descriptor")
     public DataSource getInstance(ConnectionDescriptor descriptor) {
         DataSource ds_pooled;
         ConnectionDescriptor currentDescriptor = new ConnectionDescriptor(descriptor);
 
-        //First checking cache
-        Element element;
-        if ((element = cache.get(currentDescriptor)) != null) {
-            return (DataSource)element.getValue();
-        }
-
-        //No luck, create new DS
         DataSource ds_unpooled = null;
         Map<String, Object> overrideProps = new HashMap<String, Object>();
 
@@ -62,8 +43,6 @@ public class JdbcDataSource {
         } catch (SQLException e) {
             throw new ConnectionException(e);
         }
-
-        cache.put(new Element(currentDescriptor, ds_pooled));
         return ds_pooled;
     }
 

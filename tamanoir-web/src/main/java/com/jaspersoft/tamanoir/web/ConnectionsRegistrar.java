@@ -43,7 +43,6 @@ import javax.servlet.ServletContextListener;
 public class ConnectionsRegistrar implements ServletContextListener {
     private final static Log log = LogFactory.getLog(ConnectionsRegistrar.class);
 
-    private EhCacheConnectionStorage storage;
     private SessionFactory sessionFactory;
 
     @Override
@@ -51,18 +50,16 @@ public class ConnectionsRegistrar implements ServletContextListener {
         ConnectionsManager.registerConnection("csv", new CsvConnectionProcessorFactory());
         ConnectionsManager.registerConnection("jdbc", new JdbcConnectionProcessorFactory());
         try {
-            storage = new EhCacheConnectionStorage();
             sessionFactory = new Configuration().configure().buildSessionFactory();
         }catch (Exception e){
             log.error("Unexpected error occur", e);
         }
-        sce.getServletContext().setAttribute(ConnectionsService.class.getName(), new ConnectionsService(storage));
+        sce.getServletContext().setAttribute(ConnectionsService.class.getName(), new ConnectionsService());
         sce.getServletContext().setAttribute(DomainsService.class.getName(), new DomainsService(sessionFactory));
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        storage.shutdown();
         sessionFactory.close();
     }
 }

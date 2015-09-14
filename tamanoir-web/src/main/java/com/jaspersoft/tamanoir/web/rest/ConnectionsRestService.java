@@ -57,7 +57,7 @@ public class ConnectionsRestService {
     @POST
     @Consumes("application/json")
     public Response createConnection(QueryConnectionDescriptor connectionDescriptor, @HeaderParam("Accept") String accept, @Context final HttpServletRequest request) throws URISyntaxException {
-        final UUID uuid = getConnectionService().saveConnectionDescriptor(connectionDescriptor);
+        final UUID uuid = getConnectionService().getConnection(null, connectionDescriptor).getUuid();
         ConnectionsManager connectionsManager = new ConnectionsManager();
         final Response.ResponseBuilder response = Response.created(new URI(request.getRequestURL().append("/").append(uuid.toString()).toString()));
         if(accept != null && accept.toLowerCase().contains("metadata")){

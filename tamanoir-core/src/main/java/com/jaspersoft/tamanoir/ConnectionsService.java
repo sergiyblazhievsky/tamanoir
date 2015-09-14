@@ -26,6 +26,7 @@ import com.jaspersoft.tamanoir.connection.storage.ConnectionContainer;
 import com.jaspersoft.tamanoir.connection.storage.ConnectionsStorage;
 import com.jaspersoft.tamanoir.dto.QueryConnectionDescriptor;
 import com.jaspersoft.tamanoir.dto.query.UnifiedTableQuery;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.util.UUID;
 
@@ -35,20 +36,28 @@ import java.util.UUID;
  * @author Yaroslav.Kovalchyk
  */
 public class ConnectionsService {
-    private final ConnectionsStorage storage;
     private final ConnectionsManager connectionsManager;
-    public ConnectionsService(ConnectionsStorage storage){
-        this.storage = storage;
+
+    public ConnectionsService(){
         connectionsManager = new ConnectionsManager();
     }
 
-    public UUID saveConnectionDescriptor(QueryConnectionDescriptor connectionDescriptor){
-        connectionsManager.testConnection(connectionDescriptor);
-        return storage.storeConnection(new ConnectionContainer().setConnectionDescriptor(connectionDescriptor));
+    @Cacheable(cacheNames="connections", key="#uuid")
+    public ConnectionContainer getConnection(UUID uuid, QueryConnectionDescriptor connectionDescriptor) {
+        ConnectionContainer connectionContainer = new ConnectionContainer();
+        if(connectionDescriptor != null) {
+            connectionsManager.testConnection(connectionDescriptor);
+            connectionContainer.setConnectionDescriptor(connectionDescriptor);
+        }
+        if(uuid == null) {
+            uuid = UUID.randomUUID();
+        }
+        connectionContainer.setUuid(uuid);
+        return connectionContainer;
     }
 
     public <T extends DataSet> T getDataSet(UUID connectionUuid){
-        final ConnectionContainer connectionContainer = storage.getConnection(connectionUuid);
+        final ConnectionContainer connectionContainer = getConnection(connectionUuid, null);
         if(connectionContainer.getDataSet() == null){
             synchronized (connectionContainer){
                 if(connectionContainer.getDataSet() == null){
@@ -65,7 +74,7 @@ public class ConnectionsService {
     }
 
     public QueryConnectionDescriptor getConnectionDescriptor(UUID uuid){
-        return storage.getConnection(uuid).getConnectionDescriptor();
+        return getConnection(uuid, null).getConnectionDescriptor();
     }
 
     public SchemaElement getDataSetMetadata(UUID uuid){
