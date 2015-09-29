@@ -21,6 +21,7 @@
 package com.jaspersoft.tamanoir.dto;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +31,7 @@ import java.util.Map;
  * @author Yaroslav.Kovalchyk
  */
 @XmlRootElement(name = "connection")
-public class ConnectionDescriptor<T extends ConnectionDescriptor<T>> {
+public class ConnectionDescriptor<T extends ConnectionDescriptor<T>> implements Serializable {
     private String type;
     private String url;
     private Map<String, String> properties;
